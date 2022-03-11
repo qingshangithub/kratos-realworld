@@ -14,7 +14,16 @@ func (s *RealWorldService) Login(ctx context.Context, req *pb.LoginRequest) (*pb
 	}, nil
 }
 func (s *RealWorldService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.UserReply, error) {
-	return &pb.UserReply{}, nil
+	u, err := s.uc.Register(ctx, req.User.Username, req.User.Email, req.User.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UserReply{
+		User: &pb.UserReply_User{
+			Username: u.Username,
+			Token:    u.Token,
+		},
+	}, nil
 }
 func (s *RealWorldService) GetCurrentUser(ctx context.Context, req *emptypb.Empty) (*pb.UserReply, error) {
 	return &pb.UserReply{}, nil
