@@ -6,6 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/selector"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/gorilla/handlers"
 	v1 "kratos-realworld/api/realworld/v1"
 	"kratos-realworld/internal/conf"
 	"kratos-realworld/internal/pkg/middleware/auth"
@@ -15,8 +16,8 @@ import (
 func NewSkipRoutesMatcher() selector.MatchFunc {
 
 	skipRoutes := make(map[string]struct{})
-	skipRoutes["/helloworld.v1.RealWorld/Login"] = struct{}{}
-	skipRoutes["/helloworld.v1.RealWorld/Register"] = struct{}{}
+	skipRoutes["/realworld.v1.RealWorld/Login"] = struct{}{}
+	skipRoutes["/realworld.v1.RealWorld/Register"] = struct{}{}
 	return func(ctx context.Context, operation string) bool {
 		if _, ok := skipRoutes[operation]; ok {
 			return false
@@ -32,6 +33,13 @@ func NewHTTPServer(c *conf.Server, jwtc *conf.JWT, greeter *service.RealWorldSer
 			recovery.Recovery(),
 			selector.Server(auth.JWTAuth(jwtc.Token)).Match(NewSkipRoutesMatcher()).Build(),
 			//auth.JWTAuth(jwtc.Token),
+		),
+		http.Filter(
+			handlers.CORS(
+				handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+				handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
+				handlers.AllowedOrigins([]string{"*"}),
+			),
 		),
 	}
 	if c.Http.Network != "" {
