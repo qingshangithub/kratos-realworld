@@ -4,9 +4,14 @@ import (
 	"context"
 	"google.golang.org/protobuf/types/known/emptypb"
 	pb "kratos-realworld/api/realworld/v1"
+	"kratos-realworld/internal/errors"
 )
 
 func (s *RealWorldService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.UserReply, error) {
+	if len(req.User.Email) == 0 {
+		return nil, errors.NewHTTPError(422, "email", "cannot be empty")
+	}
+
 	return &pb.UserReply{
 		User: &pb.UserReply_User{
 			Username: "boom",
