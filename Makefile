@@ -64,6 +64,16 @@ all:
 wire:
 	cd cmd/kratos-realworld && wire
 
+.PHONY: startdb
+# start database
+startdb:
+	cd deploy/mysql && docker-compose up -d
+
+.PHONY: stopdb
+# stop database
+stopdb:
+	cd deploy/mysql && docker-compose down
+
 # show help
 help:
 	@echo ''

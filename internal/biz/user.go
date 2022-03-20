@@ -28,9 +28,13 @@ type UserLogin struct {
 type UserRepo interface {
 	CreateUser(ctx context.Context, user *User) error
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetUserByUsername(ctx context.Context, username string) (*User, error)
 }
 
 type ProfileRepo interface {
+	GetProfile(ctx context.Context, username string) (*Profile, error)
+	FollowUser(ctx context.Context, username string) (*Profile, error)
+	UnfollowUser(ctx context.Context, username string) (*Profile, error)
 }
 
 type UserUsecase struct {
@@ -38,6 +42,13 @@ type UserUsecase struct {
 	pr   ProfileRepo
 	jwtc *conf.JWT
 	log  *log.Helper
+}
+
+type Profile struct {
+	Username  string
+	Bio       string
+	Image     string
+	Following bool
 }
 
 func hashPassword(pwd string) string {
@@ -96,4 +107,8 @@ func (uc *UserUsecase) Login(ctx context.Context, email, password string) (*User
 		Bio:      u.Bio,
 		Image:    u.Image,
 	}, nil
+}
+
+func (uc *UserUsecase) GetCurrentUser(ctx context.Context) (*User, error) {
+	return nil, nil
 }
